@@ -3,10 +3,19 @@
 
 html, body {
     font-family: 'Roboto', sans-serif;
-    background: $lighter-blue;
+  //  background: $lighter-blue;
     margin: 0;
     padding: 0;
+        height: 100%;
+        width: 100%;
+}
+
+#app {
+    height: 100%;
+    width: 100%;
 }
 
 .App {
+        height: 100%;
+        width: 100%;
 }

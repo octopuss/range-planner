@@ -1,5 +1,6 @@
 // IMPORTANT! babel-polyfill must be imported before anything else
 import 'babel-polyfill';
+//import injectTapEventPlugin from 'react-tap-event-plugin';
 import React from 'react';
 import { render } from 'react-dom';
 import { App } from './components';
@@ -8,6 +9,7 @@ import { Provider } from 'react-redux';
 import { browserHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
 
+//injectTapEventPlugin();
 const history = syncHistoryWithStore(browserHistory, store);
 
 render(

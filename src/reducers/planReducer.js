@@ -9,6 +9,9 @@ const planReducer = (state = {}, action) => {
         case actionTypes.SELECT_GROUP:
             const { group } = action.payload;
             return updeep.updateIn('selectedGroup', group, state);
+        case actionTypes.LOCATION_UPDATE:
+            const { coords } = action.payload;
+            return updeep.update({'coords': coords}, state);
         default:
             return state;
     }

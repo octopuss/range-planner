@@ -1,18 +1,31 @@
 @import "../variables";
 
 .Animals {
-    padding: 0px 20px;
+    padding: 5px 0;
     margin: auto;
-    width: 95%;
-    .slick-slide {
-        h3 {
-            background: $animalBg;
-            color: $animalColor;
-            line-height: 80px;
-            text-align: center;
-            font-size: 30px;
-            margin: 5px;
-            position: relative;
+    &-Animal {
+        height: 20vh;
+        background: $animalBg;
+        color: $animalColor;
+        text-align: center;
+        margin: 5px;
+        position: relative;
+        display: block;
+        width: 30vw;
+        line-height:80pt;
+        font-size: 50pt;
+        text-shadow: 0 0 2px $white;
+        p {
+            padding: 5px 0;
+            display: block;
+            width: 100%;
+            position: absolute;
+            bottom: 0;
+            background: $light-blue;
+            color: $dark-purple;
+            font-size: 20px;
+            line-height: 20px;
+            margin: 0;
         }
     }
 }
