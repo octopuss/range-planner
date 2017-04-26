@@ -1,7 +1,7 @@
 import { filter, whereEq, merge } from 'ramda';
-
-export const resolveTarget = ({ targets, plan }) => filter(
-    whereEq({ number: plan.selectedTarget }))(targets)[0];
+import PropTypes from 'prop-types';
+export const resolveTarget = ({ targets, course }) => filter(
+    whereEq({ number: course.selectedTarget }))(targets)[0];
 
 export const commonSettings = (className) => merge(
     {dots: false,
@@ -12,6 +12,19 @@ export const commonSettings = (className) => merge(
         arrows: false,
         initialSlide: 0}
 );
+
+export const coordsShape = PropTypes.shape({
+    lat: PropTypes.number,
+    lng: PropTypes.number
+});
+
+export const targetShape = PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    group: PropTypes.number,
+    animalId: PropTypes.number,
+    number: PropTypes.number,
+    coords: coordsShape,
+});
 
 export const getPosition = () => {
     let navigator = typeof window !== 'undefined' ? window.navigator : null;

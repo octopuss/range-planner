@@ -4,7 +4,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import PropTypes from 'prop-types';
-import { resolveTarget } from '../../utils';
+import { resolveTarget, coordsShape } from '../../utils';
 import { updateTarget } from '../../actions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -32,7 +32,7 @@ const AddPoint = props => {
 
 const _mapStateToProps = state => ({
     target: resolveTarget(state),
-    coords: state.plan.coords,
+    coords: state.course.coords,
 });
 
 const _mapDispatchToProps = dispatch => ({
@@ -40,10 +40,7 @@ const _mapDispatchToProps = dispatch => ({
 });
 
 AddPoint.propTypes =  {
-    coords: PropTypes.shape({
-        lat: PropTypes.number,
-        lng: PropTypes.number
-    }),
+    coords: coordsShape,
     updateTarget: PropTypes.func,
 };
 

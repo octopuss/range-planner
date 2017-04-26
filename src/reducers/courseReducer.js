@@ -1,7 +1,7 @@
 import { actionTypes } from '../constants/';
 import updeep from 'updeep';
 
-const planReducer = (state = {}, action) => {
+const courseReducer = (state = {}, action) => {
     switch (action.type) {
         case actionTypes.SELECT_TARGET:
             const { selectedTarget } = action.payload;
@@ -17,4 +17,4 @@ const planReducer = (state = {}, action) => {
     }
 };
 
-export default planReducer;
+export default courseReducer;

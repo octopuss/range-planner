@@ -7,7 +7,7 @@ import { filter, whereEq, length, pluck, contains, curry, indexOf, map } from 'r
 import '../slick.scss';
 import './animals.scss';
 import { updateTarget } from '../../actions';
-import { resolveTarget, commonSettings } from '../../utils';
+import { resolveTarget, commonSettings, targetShape } from '../../utils';
 
 const Animals = props => {
     const className = 'Animals';
@@ -52,16 +52,7 @@ const Animals = props => {
 
 Animals.PropTypes = {
     selected: PropTypes.number,
-    target: PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        group: PropTypes.number,
-        animalId: PropTypes.number,
-        number: PropTypes.number,
-        coords: PropTypes.shape({
-            lat: PropTypes.number,
-            lng: PropTypes.number
-        }),
-    }),
+    target: targetShape,
     animals: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.number.isRequired,
         group: PropTypes.number,
@@ -74,9 +65,9 @@ Animals.PropTypes = {
 const _filterAnimals = (animals, group) => filter(whereEq({ group: group }))(animals);
 
 const _mapStateToProps = state => ({
-    selected: state.plan.selectedAnimal,
+    selected: state.course.selectedAnimal,
     target: resolveTarget(state),
-    animals: _filterAnimals(state.animals, state.plan.selectedGroup),
+    animals: _filterAnimals(state.animals, state.course.selectedGroup),
     used: pluck('animalId')(state.targets),
 });
 

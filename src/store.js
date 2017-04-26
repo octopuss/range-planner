@@ -1,14 +1,13 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux';
-import createLogger from 'redux-logger';
 import { browserHistory } from 'react-router';
 import { routerMiddleware, routerReducer } from 'react-router-redux';
 import dummyReducer from './reducers/dummyReducer';
 import targetsReducer from './reducers/targetsReducer';
-import planReducer from './reducers/planReducer';
+import courseReducer from './reducers/courseReducer';
+import coursesReducer from './reducers/coursesReducer';
 import { actionTypes } from './constants/';
 import { getPosition } from './utils/';
 
-const logger = createLogger();
 const reduxRouterMiddleware = routerMiddleware(browserHistory);
 
 const getAnimals = [
@@ -21,11 +20,15 @@ const getAnimals = [
 ];
 
 const initialState = {
+    courses : [
+        {id: 3, targets: 5, name: 'Žleby 2018'},
+        {id: 4, targets: 3, name: 'Sedmihorky 2018'},
+        {id: 5, targets: 5, name: 'Adršpach 2018'},
+    ],
     course: {
         name: 'Žleby 2018',
         targets: 5,
-    },
-    plan: {
+        id: 3,
         selectedTarget: 4,
         selectedGroup: 4,
         selectedAnimal: 4,
@@ -36,14 +39,14 @@ const initialState = {
         zoom: 17,
     },
     targets: [
-        { id: 1, number: 1, animalId: 1, group: 1, coords: null },
-        { id: 2, number: 2, animalId: 2, group: 2, coords: null },
-        { id: 3, number: 3, animalId: 3, group: 3, coords: null },
-        { id: 4, number: 4, animalId: 4, group: 4, coords: null },
-        { id: 5, number: 5, animalId: 5, group: 1, coords: null },
-        { id: 6, number: 6, animalId: 6, group: 1, coords: null },
-        { id: 7, number: 7, animalId: 7, group: 1, coords: null },
-        { id: 8, number: 8, animalId: 8, group: 1, coords: null },
+        { id: 1, number: 1, animalId: 1, courseId:3, group: 1, coords: null },
+        { id: 2, number: 2, animalId: 2, courseId:3, group: 2, coords: null },
+        { id: 3, number: 3, animalId: 3, courseId:3, group: 3, coords: null },
+        { id: 4, number: 4, animalId: 4, courseId:3, group: 4, coords: null },
+        { id: 5, number: 5, animalId: 5, courseId:3, group: 1, coords: null },
+        { id: 6, number: 6, animalId: 6, courseId:3, group: 1, coords: null },
+        { id: 7, number: 7, animalId: 7, courseId:3, group: 1, coords: null },
+        { id: 8, number: 8, animalId: 8, courseId:3, group: 1, coords: null },
         // { id: 9, number: 9, animalId: 9, group: 1, coords: null },
         // { id: 10, number: 10, animalId: 10, group: 1, coords: null },
         // { id: 11, number: 11, animalId: 11, group: 1, coords: null },
@@ -55,9 +58,9 @@ const devext = typeof window === 'object' && typeof window.devToolsExtension !==
     ? window.devToolsExtension()
     : f => f;
 const store = createStore(combineReducers({
-    course: dummyReducer,
+    courses: coursesReducer,
     targets: targetsReducer,
-    plan: planReducer,
+    course: courseReducer,
     animals: dummyReducer,
     routing: routerReducer,
 }), initialState, compose(devext, applyMiddleware(reduxRouterMiddleware)));

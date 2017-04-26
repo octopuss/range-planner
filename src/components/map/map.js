@@ -5,14 +5,17 @@ import {
     GoogleMap, Marker,
 } from 'react-google-maps';
 import { connect } from 'react-redux';
-import { getPosition, resolveTarget } from '../../utils/';
+import { getPosition, resolveTarget, targetShape, coordsShape } from '../../utils/';
 import { bindActionCreators } from 'redux';
 import { filter, map, curry } from 'ramda';
 import { updateTarget, updatePosition, selectTarget } from '../../actions';
+import { green600, blue600, orange600, cyan600, fullWhite } from 'material-ui/styles/colors';
 
 const MapContainer = withGoogleMap(props => {
 
     const { coords, curZoom } = props;
+
+    const colors = ['43a047', '1e88e5', 'fb8c00', '00acc1'];
 
     const markerUrl = 'https://chart.googleapis.com/chart?chst=d_map_pin_letter&chld=';
 
@@ -26,15 +29,15 @@ const MapContainer = withGoogleMap(props => {
         );
         const _setTarget = curry((target, e) => props.selectTarget(target));
         const hasCoords = ({ coords }) => coords !== null;
-        const _markerIcon = number => {
-            const colors = number === props.selectedTarget.number ? "33691E|FFFFFF" : "009688|FFFFFF";
-            return markerUrl + number + "|" + colors;
+        const _markerIcon = ({ group, number }) => {
+            const textColor = number === props.selectedTarget.number ? 'FFFFFF' : '000000';
+            return markerUrl + number + "|" + colors[group-1] + "|" +textColor;
         };
         const toMarker = target => {
             const { number, coords } = target;
             return <Marker key={number} position={coords}
                            draggable={true} onDragEnd={_updateMarkerPosition(target)}
-                           onClick={_setTarget(target)} icon={_markerIcon(target.number)}/>;
+                           onClick={_setTarget(target)} icon={_markerIcon(target)} title={target.name}/>;
         };
         return map(toMarker, filter(hasCoords)(targets));
     };
@@ -60,37 +63,18 @@ const Map = props => {
 };
 
 Map.propTypes = {
-    coords: PropTypes.shape({
-        lat: PropTypes.number,
-        lng: PropTypes.number
-    }),
+    coords:coordsShape,
     curZoom: PropTypes.number,
-    targets: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        group: PropTypes.number,
-        animalId: PropTypes.number,
-        number: PropTypes.number,
-        coords: PropTypes.shape({
-            lat: PropTypes.number,
-            lng: PropTypes.number
-        })})),
-    selectedTarget: PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        group: PropTypes.number,
-        animalId: PropTypes.number,
-        number: PropTypes.number,
-        coords: PropTypes.shape({
-            lat: PropTypes.number,
-            lng: PropTypes.number
-        })}),
+    targets: PropTypes.arrayOf(targetShape),
+    selectedTarget: targetShape,
     getPosition: PropTypes.func,
     updatePosition: PropTypes.func,
     updateTarget: PropTypes.func,
 };
 
 const _mapStateToProps = state => ({
-    coords: state.plan.coords,
-    curZoom: state.plan.zoom,
+    coords: state.course.coords,
+    curZoom: state.course.zoom,
     targets: state.targets,
     selectedTarget: resolveTarget(state)
 });
