@@ -12,20 +12,52 @@ import { withRouter } from 'react-router';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import Done from 'material-ui/svg-icons/action/done';
 import Delete from 'material-ui/svg-icons/action/delete';
-import Home from 'material-ui/svg-icons/action/home';
-import { red500 } from 'material-ui/styles/colors';
+import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
+import Divider from 'material-ui/Divider';
+import Dialog from 'material-ui/Dialog';
+import FlatButton from 'material-ui/FlatButton';
 injectTapEventPlugin();
 
-const CoursePlanner = props => {
-    const _handleBackClick = () => {
-        props.router.push('/');
+class MenuBar extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { open: false };
+    }
+
+    _handleBackClick = () => {
+        this.props.router.push('/');
     };
-    return (
-        <div>
-            <MuiThemeProvider>
+
+    handleOpen = () => this.setState({ open: true });
+
+    handleClose = action => () => this.setState({ open: false }, action);
+
+    render() {
+        const actions = [
+            <FlatButton
+                label="Cancel"
+                primary={false}
+                onTouchTap={this.handleClose(this.props.onCancel)}
+            />,
+            <FlatButton
+                label="Ok"
+                primary={true}
+                onTouchTap={this.handleClose(this.props.onOk)}
+            />,
+        ];
+        const dialog = <Dialog
+            actions={actions}
+            modal={false}
+            open={this.state.open}
+            onRequestClose={this.handleClose(this.props.onCancel)}
+        >
+            Do you really want to delete this course ?
+        </Dialog>;
+        return (<MuiThemeProvider>
+            <div>
                 <AppBar
                     showMenuIconButton={false}
-                    title={props.competition}
+                    title={this.props.competition}
                     iconElementRight={ <IconMenu
                         iconButtonElement={
                             <IconButton><MoreVertIcon /></IconButton>
@@ -34,11 +66,24 @@ const CoursePlanner = props => {
                         targetOrigin={{ horizontal: 'left', vertical: 'top' }}
                     >
                         <MenuItem primaryText="Save" leftIcon={<Done />} />
-                        <MenuItem primaryText="Delete" leftIcon={<Delete color={red500}/>} />
-                        <MenuItem primaryText="Back" leftIcon={<Home/>} onClick={_handleBackClick} />
+                        <MenuItem primaryText="Back" leftIcon={<ArrowBack/>}
+                                  onTouchTap={this._handleBackClick} />
+                        <Divider />
+                        <MenuItem primaryText="Remove" leftIcon={<Delete/>}
+                                  onTouchTap={this.handleOpen} />
                     </IconMenu>}
                 />
-            </MuiThemeProvider>
+                {dialog}
+            </div>
+        </MuiThemeProvider>);
+    }
+}
+
+const CoursePlanner = props => {
+
+    return (
+        <div>
+            <MenuBar  {...props} />
             <Targets />
             <Groups />
             <div style={{ clear: 'both' }} />
