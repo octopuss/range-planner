@@ -1,5 +1,4 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import AppBar from 'material-ui/AppBar';
 import IconButton from 'material-ui/IconButton';
@@ -8,6 +7,14 @@ import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 import MenuItem from 'material-ui/MenuItem';
 import { Groups, Targets, Animals, Map, AddPoint } from '../../components';
 import { connect } from 'react-redux';
+import { compose } from 'ramda';
+import {
+    firebaseConnect,
+    dataToJS,
+    pathToJS,
+    isLoaded,
+    isEmpty
+} from 'react-redux-firebase'
 import { withRouter } from 'react-router';
 import injectTapEventPlugin from 'react-tap-event-plugin';
 import Done from 'material-ui/svg-icons/action/done';
@@ -24,9 +31,7 @@ class MenuBar extends React.Component {
         this.state = { open: false };
     }
 
-    _handleBackClick = () => {
-        this.props.router.push('/');
-    };
+    _handleBackClick = () => this.props.router.push('/');
 
     handleOpen = () => this.setState({ open: true });
 
@@ -57,7 +62,7 @@ class MenuBar extends React.Component {
             <div>
                 <AppBar
                     showMenuIconButton={false}
-                    title={this.props.competition}
+                    title={!isLoaded(this.props.name) ? 'Course' : this.props.name}
                     iconElementRight={ <IconMenu
                         iconButtonElement={
                             <IconButton><MoreVertIcon /></IconButton>
@@ -94,14 +99,11 @@ const CoursePlanner = props => {
     );
 };
 
-CoursePlanner.PropTypes = {
-    router: PropTypes.shape(
-        { push: PropTypes.func.isRequired }),
+const _mapStateToProps = (state, ownProps) => {
+    return {
+        name: dataToJS(state.firebase, 'courses/' + ownProps.params.id + '/name'),
+    }
 };
 
-const _mapStateToProps = state => ({
-    competition: state.course.name,
-});
-
-const _mapDispatchToProps = dispatch => ({});
-export default connect(_mapStateToProps, _mapDispatchToProps)(withRouter(CoursePlanner));
+export default compose(connect(_mapStateToProps, null), firebaseConnect(['/courses']), withRouter)(
+    CoursePlanner);

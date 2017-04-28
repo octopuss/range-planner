@@ -5,11 +5,10 @@ import {
     GoogleMap, Marker,
 } from 'react-google-maps';
 import { connect } from 'react-redux';
-import { getPosition, resolveTarget, targetShape, coordsShape } from '../../utils/';
+import { getPosition, resolveTarget } from '../../utils/';
 import { bindActionCreators } from 'redux';
 import { filter, map, curry } from 'ramda';
 import { updateTarget, updatePosition, selectTarget } from '../../actions';
-import { green600, blue600, orange600, cyan600, fullWhite } from 'material-ui/styles/colors';
 
 const MapContainer = withGoogleMap(props => {
 
@@ -60,16 +59,6 @@ const Map = props => {
             onMapLoad={props.getPosition} {...props}>
         </MapContainer>
     );
-};
-
-Map.propTypes = {
-    coords:coordsShape,
-    curZoom: PropTypes.number,
-    targets: PropTypes.arrayOf(targetShape),
-    selectedTarget: targetShape,
-    getPosition: PropTypes.func,
-    updatePosition: PropTypes.func,
-    updateTarget: PropTypes.func,
 };
 
 const _mapStateToProps = state => ({

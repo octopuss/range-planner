@@ -1,6 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { compose } from 'ramda';
+import {
+    firebaseConnect,
+    dataToJS,
+    isLoaded,
+    isEmpty
+} from 'react-redux-firebase'
 import { withRouter } from 'react-router';
 import TextField from 'material-ui/TextField';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
@@ -10,56 +16,68 @@ import Done from 'material-ui/svg-icons/action/done';
 import Home from 'material-ui/svg-icons/action/home';
 import IconButton from 'material-ui/IconButton';
 
-const CourseForm = props => {
-    const divStyle = {
+class CourseForm extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = { name: '', targets: 28, selectedTarget: 1, };
+    }
+
+    static divStyle = {
         margin: 12,
     };
 
-    const btnStyle = {
+    static btnStyle = {
         marginTop: 20,
     };
 
-    const _handleSaveClick = () => {
-        props.router.push('/planner');
+    _handleSaveClick = () => {
+        this.props.firebase.push('/courses', this.state).then((snap) => {
+            for (let i = 1; i <= Number(this.state.targets); i++) {
+                this.props.firebase.push('/courses/' + snap.key + '/targets', { number: i }).then(
+                    (tg) => i === 1 ?
+                        this.props.firebase.set('/courses/' + snap.key + '/selectedTarget',
+                            tg.key) : null)
+            }
+            this.props.router.push('/planner/' + snap.key)
+        });
     };
 
-    const _handleBackClick = () => {
-        props.router.push('/');
-    };
+    _handleChange = field => e => this.setState({ [field]: e.target.value });
 
+    _handleBackClick = () => this.props.router.push('/');
 
-    return (
-        <MuiThemeProvider>
+    render() {
+        return <MuiThemeProvider>
             <div>
                 <AppBar
                     showMenuIconButton={false}
                     title="New Course"
-                    iconElementRight={<IconButton onTouchTap={_handleBackClick}><Home /></IconButton>}
+                    iconElementRight={<IconButton
+                        onTouchTap={this._handleBackClick} ><Home /></IconButton>}
                 />
-                <div style={divStyle}>
+                <div style={CourseForm.divStyle} >
                     <TextField
                         fullWidth={true}
                         floatingLabelText="Name"
+                        onChange={this._handleChange('name')}
                     />
                 </div>
-                <div style={divStyle}>
+                <div style={CourseForm.divStyle} >
                     <TextField
                         fullWidth={true}
                         floatingLabelText="Targets"
                         defaultValue="28"
+                        onChange={this._handleChange('targets')}
                     /></div>
-                <div style={divStyle}>
-                    <RaisedButton label="Save" style={btnStyle} primary={true} onTouchTap={_handleSaveClick} fullWidth={true} icon={<Done />} />
+                <div style={CourseForm.divStyle} >
+                    <RaisedButton label="Save" style={CourseForm.btnStyle} primary={true}
+                                  onTouchTap={this._handleSaveClick} fullWidth={true} icon={
+                        <Done />} />
                 </div>
             </div>
         </MuiThemeProvider>
-    );
-};
+    };
+}
 
-CourseForm.PropTypes = {
-    router: PropTypes.shape(
-        { push: PropTypes.func.isRequired }),
-};
-
-
-export default withRouter(CourseForm);
+export default compose(firebaseConnect(['/courses']), withRouter)(CourseForm);

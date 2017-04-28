@@ -7,7 +7,7 @@ import { filter, whereEq, length, pluck, contains, curry, indexOf, map } from 'r
 import '../slick.scss';
 import './animals.scss';
 import { updateTarget } from '../../actions';
-import { resolveTarget, commonSettings, targetShape } from '../../utils';
+import { resolveTarget, commonSettings } from '../../utils';
 
 const Animals = props => {
     const className = 'Animals';
@@ -48,18 +48,6 @@ const Animals = props => {
             {itemsList(props.animals)}
         </Slider>
     );
-};
-
-Animals.PropTypes = {
-    selected: PropTypes.number,
-    target: targetShape,
-    animals: PropTypes.arrayOf(PropTypes.shape({
-        id: PropTypes.number.isRequired,
-        group: PropTypes.number,
-        name: PropTypes.string,
-        image: PropTypes.string,
-    })),
-    used: PropTypes.arrayOf(PropTypes.number),
 };
 
 const _filterAnimals = (animals, group) => filter(whereEq({ group: group }))(animals);

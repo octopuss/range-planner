@@ -13,19 +13,6 @@ export const commonSettings = (className) => merge(
         initialSlide: 0}
 );
 
-export const coordsShape = PropTypes.shape({
-    lat: PropTypes.number,
-    lng: PropTypes.number
-});
-
-export const targetShape = PropTypes.shape({
-    id: PropTypes.number.isRequired,
-    group: PropTypes.number,
-    animalId: PropTypes.number,
-    number: PropTypes.number,
-    coords: coordsShape,
-});
-
 export const getPosition = () => {
     let navigator = typeof window !== 'undefined' ? window.navigator : null;
     if (!navigator || !navigator.geolocation) {

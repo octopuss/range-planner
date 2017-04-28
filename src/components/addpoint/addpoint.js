@@ -3,8 +3,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import ContentRemove from 'material-ui/svg-icons/content/remove';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import PropTypes from 'prop-types';
-import { resolveTarget, coordsShape } from '../../utils';
+import { resolveTarget } from '../../utils';
 import { updateTarget } from '../../actions';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -38,11 +37,6 @@ const _mapStateToProps = state => ({
 const _mapDispatchToProps = dispatch => ({
     updateTarget: bindActionCreators(updateTarget, dispatch),
 });
-
-AddPoint.propTypes =  {
-    coords: coordsShape,
-    updateTarget: PropTypes.func,
-};
 
 
 export default connect(_mapStateToProps, _mapDispatchToProps)(AddPoint);
