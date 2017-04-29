@@ -1,7 +1,4 @@
-import { filter, whereEq, merge } from 'ramda';
-import PropTypes from 'prop-types';
-export const resolveTarget = ({ targets, course }) => filter(
-    whereEq({ number: course.selectedTarget }))(targets)[0];
+import { merge } from 'ramda';
 
 export const commonSettings = (className) => merge(
     {dots: false,

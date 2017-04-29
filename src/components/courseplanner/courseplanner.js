@@ -86,14 +86,21 @@ class MenuBar extends React.Component {
 
 const CoursePlanner = props => {
 
+    const {firebase, planId, router}  = props;
+
+    const _handleOkClick = () => {
+        firebase.remove('/courses/' + planId);
+        router.push('/');
+    }
+
     return (
         <div>
-            <MenuBar  {...props} />
-            <Targets />
-            <Groups />
+            <MenuBar onOk={_handleOkClick}  {...props}/>
+            <Targets planId={planId}/>
+            <Groups planId={planId}/>
             <div style={{ clear: 'both' }} />
-            <Animals />
-            <Map />
+            <Animals planId={planId}/>
+            <Map planId={planId}/>
             <AddPoint />
         </div>
     );
@@ -101,9 +108,10 @@ const CoursePlanner = props => {
 
 const _mapStateToProps = (state, ownProps) => {
     return {
+        planId: ownProps.params.id,
         name: dataToJS(state.firebase, 'courses/' + ownProps.params.id + '/name'),
     }
 };
 
-export default compose(connect(_mapStateToProps, null), firebaseConnect(['/courses']), withRouter)(
+export default compose(connect(_mapStateToProps, null), firebaseConnect(props =>  ['/courses/' + props.params.id]), withRouter)(
     CoursePlanner);

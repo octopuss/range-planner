@@ -15,11 +15,11 @@ import Done from 'material-ui/svg-icons/action/done';
 import Home from 'material-ui/svg-icons/action/home';
 import IconButton from 'material-ui/IconButton';
 
-class CourseForm extends React.Component {
+class AnimalForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = { name: '', targets: 28, selectedGroup: 1, selectedAnimal: 1 };
+        this.state = { name: '', group: 1, clubId: 1 };
     }
 
     static divStyle = {
@@ -32,16 +32,7 @@ class CourseForm extends React.Component {
 
     _handleSaveClick = () => {
         let fb = this.props.firebase;
-        fb.push('/courses', this.state).then((snap) => {
-            for (let i = 1; i <= Number(this.state.targets); i++) {
-                fb.push('/courses/' + snap.key + '/targets',
-                    { number: i, group: 1 }).then(
-                    tg => i === 1 ?
-                        fb.set('/courses/' + snap.key + '/selectedTarget',
-                            tg.key) : null)
-            }
-            this.props.router.push('/planner/' + snap.key)
-        });
+        fb.push('/animals', this.state);
     };
 
     _handleChange = curry((field, e) => this.setState({ [field]: e.target.value }));
@@ -57,22 +48,22 @@ class CourseForm extends React.Component {
                     iconElementRight={<IconButton
                         onTouchTap={this._handleBackClick} ><Home /></IconButton>}
                 />
-                <div style={CourseForm.divStyle} >
+                <div style={AnimalForm.divStyle} >
+                    <TextField
+                        fullWidth={true}
+                        floatingLabelText="Group"
+                        defaultValue="1"
+                        onChange={this._handleChange('group')}
+                    />
+                </div>
+                <div style={AnimalForm.divStyle} >
                     <TextField
                         fullWidth={true}
                         floatingLabelText="Name"
                         onChange={this._handleChange('name')}
-                    />
-                </div>
-                <div style={CourseForm.divStyle} >
-                    <TextField
-                        fullWidth={true}
-                        floatingLabelText="Targets"
-                        defaultValue="28"
-                        onChange={this._handleChange('targets')}
                     /></div>
-                <div style={CourseForm.divStyle} >
-                    <RaisedButton label="Save" style={CourseForm.btnStyle} primary={true}
+                <div style={AnimalForm.divStyle} >
+                    <RaisedButton label="Save" style={AnimalForm.btnStyle} primary={true}
                                   onTouchTap={this._handleSaveClick} fullWidth={true} icon={
                         <Done />} />
                 </div>
@@ -81,4 +72,4 @@ class CourseForm extends React.Component {
     };
 }
 
-export default compose(firebaseConnect(['/courses']), withRouter)(CourseForm);
+export default compose(firebaseConnect(['/animals']), withRouter)(AnimalForm);

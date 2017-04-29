@@ -1,18 +1,22 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import {
     withGoogleMap,
     GoogleMap, Marker,
 } from 'react-google-maps';
+import { compose } from 'ramda';
+import {
+    firebaseConnect,
+    dataToJS,
+    pathToJS,
+    isLoaded,
+    isEmpty
+} from 'react-redux-firebase'
 import { connect } from 'react-redux';
-import { getPosition, resolveTarget } from '../../utils/';
-import { bindActionCreators } from 'redux';
-import { filter, map, curry } from 'ramda';
-import { updateTarget, updatePosition, selectTarget } from '../../actions';
+import { reject, keys, propEq, map, curry } from 'ramda';
 
 const MapContainer = withGoogleMap(props => {
 
-    const { coords, curZoom } = props;
+    const { coords, curZoom, targets, selected, firebase, planId } = props;
 
     const colors = ['43a047', '1e88e5', 'fb8c00', '00acc1'];
 
@@ -21,25 +25,31 @@ const MapContainer = withGoogleMap(props => {
     const _changePosition = marker =>
         props.updatePosition({ lat: marker.latLng.lat(), lng: marker.latLng.lng() });
 
-    const _markersFromTargets = targets => {
-        const _updateMarkerPosition = curry((target, marker) =>
-            props.updateTarget(target, 'coords',
-                { lat: marker.latLng.lat(), lng: marker.latLng.lng() })
-        );
-        const _setTarget = curry((target, e) => props.selectTarget(target));
-        const hasCoords = ({ coords }) => coords !== null;
-        const _markerIcon = ({ group, number }) => {
-            const textColor = number === props.selectedTarget.number ? 'FFFFFF' : '000000';
-            return markerUrl + number + "|" + colors[group-1] + "|" +textColor;
-        };
-        const toMarker = target => {
-            const { number, coords } = target;
+    const _updateMarkerPosition = curry((target, marker) =>
+        firebase.set('/courses/' + planId + '/targets/' + target + '/coords',
+            { lat: marker.latLng.lat(), lng: marker.latLng.lng() })
+    );
+
+    const _setTarget = curry(
+        (target, e) => firebase.set('/courses/' + planId + '/selectedTarget', target));
+
+    const _markerIcon = ({ group, number }, selected) => {
+        const textColor = selected ? 'FFFFFF' : '000000';
+        return markerUrl + number + "|" + colors[group - 1] + "|" + textColor;
+    };
+
+    const _markersFromTargets = (targets, selected) => map(target => {
+            const { number, coords, name } = targets[target];
             return <Marker key={number} position={coords}
                            draggable={true} onDragEnd={_updateMarkerPosition(target)}
-                           onClick={_setTarget(target)} icon={_markerIcon(target)} title={target.name}/>;
-        };
-        return map(toMarker, filter(hasCoords)(targets));
-    };
+                           onClick={_setTarget(target)} icon={_markerIcon(targets[target], selected === target)}
+                           title={name} />;
+        })(keys(reject(propEq('coords', undefined),targets)));
+
+    const _markerList = (!isLoaded(targets) || !isLoaded(selected))
+        ? 'Loading'
+        : _markersFromTargets(targets, selected);
+
     return (
         <GoogleMap
             defaultZoom={curZoom}
@@ -47,7 +57,7 @@ const MapContainer = withGoogleMap(props => {
             defaultOptions={{ disableDefaultUI: true, mapTypeId: 'satellite' }}
         >
             <Marker position={coords} label="😎" draggable={true} onDragEnd={_changePosition} />
-            {_markersFromTargets(props.targets)}
+            {_markerList}
         </GoogleMap>
     );
 });
@@ -61,18 +71,14 @@ const Map = props => {
     );
 };
 
-const _mapStateToProps = state => ({
+const _mapStateToProps = (state, ownProps) => ({
     coords: state.course.coords,
     curZoom: state.course.zoom,
-    targets: state.targets,
-    selectedTarget: resolveTarget(state)
+    targets: dataToJS(state.firebase, 'courses/' + ownProps.planId + '/targets'),
+    selected: dataToJS(state.firebase, 'courses/' + ownProps.planId + '/selectedTarget'),
 });
 
-const _mapDispatchToProps = dispatch => ({
-    getPosition: bindActionCreators(getPosition, dispatch),
-    updateTarget: bindActionCreators(updateTarget, dispatch),
-    updatePosition: bindActionCreators(updatePosition, dispatch),
-    selectTarget: bindActionCreators(selectTarget, dispatch),
-});
-
-export default connect(_mapStateToProps, _mapDispatchToProps)(Map);
+export default compose(firebaseConnect((props) => ['/courses/' + props.planId + '/targets',
+        '/courses/' + props.planId + '/selectedTarget']), connect(_mapStateToProps, null),
+    )(
+    Map);

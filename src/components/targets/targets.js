@@ -2,13 +2,9 @@ import React from 'react';
 import Slider from 'react-slick';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { bindActionCreators } from 'redux';
 import { compose, curry, map, keys } from 'ramda';
-import { selectTarget } from '../../actions';
 import { lightBlue900, lightBlue50, teal900, teal200, fullWhite } from 'material-ui/styles/colors';
 import { commonSettings } from '../../utils';
-import CircularProgress from 'material-ui/CircularProgress';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
     firebaseConnect,
     dataToJS,
@@ -31,7 +27,13 @@ const Targets = props => {
         useCSS: true,
     });
 
-    const _handleTargetSelect = curry((target, e) => firebase.set('/courses/'+planId+'/selectedTarget', target));
+    const _handleTargetSelect = curry((target, e) => {
+        firebase.set('/courses/' + planId + '/selectedTarget', target);
+        firebase.set('/courses/' + planId + '/selectedGroup', targets[target].group);
+        if (targets[target].animalId) {
+            firebase.set('/courses/' + planId + '/selectedAnimal', targets[target].animalId);
+        }
+    });
 
     const doneIcon = selected => (
         <svg fill={selected ? fullWhite : teal200} height="20" width="20" viewBox="0 0 20 25"
@@ -67,9 +69,7 @@ const Targets = props => {
 
     const itemList = (!isLoaded(targets))
         ? 'Loading'
-        : (isEmpty(targets))
-            ? 'Targets are empty'
-            : <Slider {...settings}>{items(targets, selected)}</Slider>;
+        : <Slider {...settings}>{items(targets, selected)}</Slider>;
 
     return (
         <div>
@@ -80,14 +80,10 @@ const Targets = props => {
 
 const _mapStateToProps = (state, ownProps) => {
     return {
-        planId: ownProps.params.id,
-        targets: dataToJS(state.firebase, 'courses/' + ownProps.params.id + '/targets' ),
-        selected: dataToJS(state.firebase, 'courses/' + ownProps.params.id + '/selectedTarget' ),
+        targets: dataToJS(state.firebase, 'courses/' + ownProps.planId + '/targets'),
+        selected: dataToJS(state.firebase, 'courses/' + ownProps.planId + '/selectedTarget'),
     }
 };
 
-const _mapDispatchToProps = dispatch => ({
-    selectTarget: bindActionCreators(selectTarget, dispatch),
-});
-
-export default compose(withRouter, firebaseConnect(['/courses']), connect(_mapStateToProps, null),)(Targets);
+export default compose(withRouter, firebaseConnect(props => ['/courses/' + props.planId]),
+    connect(_mapStateToProps, null),)(Targets);
