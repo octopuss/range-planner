@@ -17,7 +17,6 @@ import {
 } from 'react-redux-firebase'
 import { withRouter } from 'react-router';
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import Done from 'material-ui/svg-icons/action/done';
 import Delete from 'material-ui/svg-icons/action/delete';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import Divider from 'material-ui/Divider';
@@ -70,7 +69,6 @@ class MenuBar extends React.Component {
                         anchorOrigin={{ horizontal: 'left', vertical: 'top' }}
                         targetOrigin={{ horizontal: 'left', vertical: 'top' }}
                     >
-                        <MenuItem primaryText="Save" leftIcon={<Done />} />
                         <MenuItem primaryText="Back" leftIcon={<ArrowBack/>}
                                   onTouchTap={this._handleBackClick} />
                         <Divider />

@@ -5,9 +5,9 @@ import { render } from 'react-dom';
 import { App } from './components';
 import store from './store';
 import { Provider } from 'react-redux';
-import { browserHistory } from 'react-router';
+import { hashHistory } from 'react-router';
 import { syncHistoryWithStore } from 'react-router-redux';
-const history = syncHistoryWithStore(browserHistory, store);
+const history = syncHistoryWithStore(hashHistory, store);
 
 render(
     <div>

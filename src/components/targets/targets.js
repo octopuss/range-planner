@@ -2,7 +2,7 @@ import React from 'react';
 import Slider from 'react-slick';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router';
-import { compose, curry, map, keys } from 'ramda';
+import { compose, curry, map, keys, prop, sortBy } from 'ramda';
 import { lightBlue900, lightBlue50, teal900, teal200, fullWhite } from 'material-ui/styles/colors';
 import { commonSettings } from '../../utils';
 import {
@@ -48,24 +48,28 @@ const Targets = props => {
             <path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z" />
         </svg>);
 
-    const items = (targets, selected) => map(key => {
-        const { number, coords } = targets[key];
-        return (
-            <div key={'target' + key} id={key} onClick={_handleTargetSelect(key)}
-                 style={{
-                     color: selected === key ? fullWhite : teal900,
-                     backgroundColor: selected === key ? lightBlue900 : lightBlue50,
-                     textAlign: 'center',
-                     marginLeft: 5,
-                     marginBottom: 3,
-                     width: 50,
-                     boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px'
-                 }}
-            >
-                <div style={{ padding: '10px 0px' }} >{coords ?
-                    doneIcon(selected === key) : null}{number}</div>
-            </div>)
-    })(keys(targets));
+    const items = (targets, selected) => {
+        const output = [];
+        map(key => {
+            const { number, coords } = targets[key];
+            output[number] = (
+                <div key={'target' + key} id={key} onClick={_handleTargetSelect(key)}
+                     style={{
+                         color: selected === key ? fullWhite : teal900,
+                         backgroundColor: selected === key ? lightBlue900 : lightBlue50,
+                         textAlign: 'center',
+                         marginLeft: 5,
+                         marginBottom: 3,
+                         width: 50,
+                         boxShadow: 'rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px'
+                     }}
+                >
+                    <div style={{ padding: '10px 0px' }} >{coords ?
+                        doneIcon(selected === key) : null}{number}</div>
+                </div>)
+        })(keys(targets));
+        return output;
+    };
 
     const itemList = (!isLoaded(targets))
         ? 'Loading'
